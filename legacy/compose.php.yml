@@ -1,0 +1,97 @@
+name: trabajos-vps
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: deploy/web/Dockerfile
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?Define SITE_ADDRESS}
+      ACME_EMAIL: ${ACME_EMAIL:?Define ACME_EMAIL}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+    security_opt: [no-new-privileges:true]
+
+  api:
+    build:
+      context: .
+      dockerfile: deploy/php/Dockerfile
+    environment:
+      APP_ENV: production
+      PUBLIC_APP_URL: ${PUBLIC_APP_URL:?Define PUBLIC_APP_URL}
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-trabajos}
+      DB_USER: ${DB_USER:-trabajos}
+      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD}
+      ONLYOFFICE_PUBLIC_URL: ${ONLYOFFICE_PUBLIC_URL:?Define ONLYOFFICE_PUBLIC_URL}
+      ONLYOFFICE_JWT_SECRET: ${ONLYOFFICE_JWT_SECRET:?Define ONLYOFFICE_JWT_SECRET}
+      ONLYOFFICE_DOWNLOAD_ORIGINS: ${ONLYOFFICE_DOWNLOAD_ORIGINS:-}
+      DOCUMENT_TOKEN_SECRET: ${DOCUMENT_TOKEN_SECRET:?Define DOCUMENT_TOKEN_SECRET}
+      RECOVERY_PEPPER: ${RECOVERY_PEPPER:?Define RECOVERY_PEPPER}
+      ADMIN_NAME: ${ADMIN_NAME:-Administrador de trabajos}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Define ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Define ADMIN_PASSWORD}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      TRUST_PROXY: "true"
+      STORAGE_PATH: /srv/private
+    volumes:
+      - private_storage:/srv/private
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777,size=128m
+      - /usr/local/var/run:uid=33,gid=33,mode=0755
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, "SCRIPT_NAME=/fpm-ping SCRIPT_FILENAME=/fpm-ping REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 | grep -q pong && php bin/console.php check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    logging: *logging
+
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-trabajos}
+      MYSQL_USER: ${DB_USER:-trabajos}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Define MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./api/database/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, "MYSQL_PWD=$$MYSQL_PASSWORD mysql -u$$MYSQL_USER -D $$MYSQL_DATABASE -e 'SELECT 1 FROM trabajos_articles LIMIT 0' >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+    restart: unless-stopped
+    logging: *logging
+    security_opt: [no-new-privileges:true]
+
+volumes:
+  mysql_data:
+  private_storage:
+  caddy_data:
+  caddy_config:

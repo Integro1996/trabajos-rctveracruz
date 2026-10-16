@@ -1,0 +1,42 @@
+{
+    email {$ACME_EMAIL}
+    admin off
+}
+
+{$SITE_ADDRESS} {
+    encode zstd gzip
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy same-origin
+        -Server
+    }
+    request_body {
+        max_size 32MB
+    }
+
+    @private path_regexp private (?i)(^|/)[.]|[.](php|sql|ini|log|bak)$
+    handle @private {
+        respond 404
+    }
+
+    @api path /api /api/* /recover /recover/* /health
+    handle @api {
+        reverse_proxy api:9000 {
+            transport fastcgi {
+                root /srv/app/api/public
+                env SCRIPT_FILENAME /srv/app/api/public/index.php
+                read_timeout 150s
+            }
+        }
+    }
+
+    handle {
+        root * /srv/www
+        route {
+            try_files {path} /index.html
+            @index path /index.html
+            header @index Cache-Control "no-cache"
+            file_server
+        }
+    }
+}

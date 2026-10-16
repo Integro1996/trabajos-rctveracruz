@@ -1,0 +1,11 @@
+**/.env*
+**/node_modules
+**/vendor
+**/dist
+**/.git
+legacy
+.migration-backup
+.migration-tools
+backups
+**/*.log
+**/*-smoke.png

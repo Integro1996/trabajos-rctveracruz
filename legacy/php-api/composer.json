@@ -1,0 +1,24 @@
+{
+  "name": "rctveracruz/trabajos-api",
+  "description": "API PHP para trabajos.rctveracruz.org",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.2",
+    "ext-curl": "*",
+    "ext-dom": "*",
+    "ext-fileinfo": "*",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-openssl": "*",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "ext-scrypt": "*",
+    "ext-zip": "*",
+    "chillerlan/php-qrcode": "^6.0"
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
+}

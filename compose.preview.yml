@@ -1,0 +1,11 @@
+# Temporary public preview through two local Cloudflare tunnels.
+# Supply PREVIEW_APP_URL and PREVIEW_DOCS_URL in the shell running Docker Compose.
+services:
+  backend:
+    environment:
+      PUBLIC_APP_URL: ${PREVIEW_APP_URL:?Set PREVIEW_APP_URL first}
+      ONLYOFFICE_PUBLIC_URL: ${PREVIEW_DOCS_URL:?Set PREVIEW_DOCS_URL first}
+      ONLYOFFICE_DOWNLOAD_ORIGINS: http://onlyoffice,${PREVIEW_DOCS_URL:?Set PREVIEW_DOCS_URL first}
+      COOKIE_SECURE: 'true'
+  nginx:
+    ports: !override ['127.0.0.1:3200:80', '127.0.0.1:8081:8081']

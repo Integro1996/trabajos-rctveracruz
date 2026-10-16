@@ -1,0 +1,10 @@
+client_max_body_size 25m;
+location / {
+  proxy_pass http://docs_upstream;
+  include /etc/nginx/snippets/forward.conf;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection $connection_upgrade;
+  proxy_read_timeout 3600s;
+  proxy_send_timeout 3600s;
+  proxy_buffering off;
+}

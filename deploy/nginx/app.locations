@@ -1,0 +1,13 @@
+client_max_body_size 12m;
+location /api/ {
+  proxy_pass http://api_upstream;
+  include /etc/nginx/snippets/forward.conf;
+  proxy_read_timeout 180s;
+}
+location /recover/ {
+  access_log off;
+  proxy_pass http://api_upstream;
+  include /etc/nginx/snippets/forward.conf;
+}
+location = /health { proxy_pass http://api_upstream/health; }
+location / { proxy_pass http://web_upstream; }

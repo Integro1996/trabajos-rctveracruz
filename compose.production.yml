@@ -1,0 +1,13 @@
+services:
+  backend:
+    environment:
+      PUBLIC_APP_URL: https://trabajos.rctveracruz.org
+      ONLYOFFICE_PUBLIC_URL: https://docs.rctveracruz.org
+      ONLYOFFICE_DOWNLOAD_ORIGINS: http://onlyoffice,https://docs.rctveracruz.org
+      COOKIE_SECURE: 'true'
+  nginx:
+    ports: !override ['80:80', '443:443']
+    volumes:
+      - ./deploy/nginx/production.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/certs:/etc/nginx/certs:ro
+      - ./deploy/acme:/var/www/acme:ro

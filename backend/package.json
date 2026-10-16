@@ -1,0 +1,32 @@
+{
+  "name": "rct-trabajos-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test tests/*.test.js",
+    "test:integration": "node tests/integration.mjs",
+    "test:pages": "node tests/page-limits-integration.mjs",
+    "test:admin-crud": "node tests/admin-crud-integration.mjs",
+    "test:callback": "node tests/callback-integration.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1124.0",
+    "@xmldom/xmldom": "0.9.12",
+    "bcryptjs": "^3.0.3",
+    "cors": "2.8.6",
+    "docx": "9.7.1",
+    "express": "5.2.1",
+    "helmet": "8.3.0",
+    "jsonwebtoken": "9.0.3",
+    "jszip": "3.10.2",
+    "mammoth": "1.12.2",
+    "pdf-lib": "^1.17.1",
+    "pg": "^8.23.0",
+    "pino": "10.3.1",
+    "pino-http": "11.0.0",
+    "zod": "4.5.4"
+  }
+}

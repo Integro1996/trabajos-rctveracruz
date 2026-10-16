@@ -1,0 +1,26 @@
+{
+  "name": "rct-trabajos-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test:smoke": "node tests/editor-smoke.mjs",
+    "test:formula-smoke": "node tests/formula-smoke.mjs",
+    "test:admin-smoke": "node tests/admin-smoke.mjs",
+    "test:admin-dashboard-smoke": "node tests/admin-dashboard-smoke.mjs"
+  },
+  "dependencies": {
+    "@onlyoffice/document-editor-react": "2.2.0",
+    "mathlive": "0.111.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "5.1.4",
+    "puppeteer-core": "25.9.0",
+    "vite": "7.3.6"
+  }
+}
